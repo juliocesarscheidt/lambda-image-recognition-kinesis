@@ -9,7 +9,12 @@ import (
 	"os"
 )
 
-func GetDynamoDbClient() (*dynamodb.DynamoDB, error) {
+// client adapter
+type DynamoDbClientAdapter struct {
+	PutItem func(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error)
+}
+
+func GetDynamoDbClient() (*DynamoDbClientAdapter, error) {
 	region := os.Getenv("AWS_DEFAULT_REGION")
 	if region == "" {
 		region = "us-east-1"
@@ -21,10 +26,14 @@ func GetDynamoDbClient() (*dynamodb.DynamoDB, error) {
 		log.Fatal(err)
 		return nil, err
 	}
-	return dynamodb.New(sess), nil
+	client := dynamodb.New(sess)
+	dynamoDbClientAdapter := &DynamoDbClientAdapter{
+		PutItem: client.PutItem,
+	}
+	return dynamoDbClientAdapter, nil
 }
 
-func PutItem(dynamoDbClient *dynamodb.DynamoDB, tableName string, item interface{}) error {
+func PutItem(dynamoDbClient *DynamoDbClientAdapter, tableName string, item interface{}) error {
 	dynamoDbItem, err := dynamodbattribute.MarshalMap(item)
 	if err != nil {
 		log.Fatal(err)

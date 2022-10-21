@@ -15,11 +15,11 @@ AWS_BACKEND_REGION?=sa-east-1
 # application variables
 GOLANG_VERSION?=1.18-alpine
 
-vet:
+go-vet:
 	docker container run -v $$(pwd)/../../lambda-producer:/go/src/app -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go vet .
 	docker container run -v $$(pwd)/../../lambda-consumer:/go/src/app -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go vet .
 
-compile: vet
+compile: go-vet
 	docker container run -v $$(pwd)/../../lambda-producer:/go/src/app -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go build -ldflags="-s -w" -o producer
 	mv ../../lambda-producer/producer producer
 	docker container run -v $$(pwd)/../../lambda-consumer:/go/src/app -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go build -ldflags="-s -w" -o consumer

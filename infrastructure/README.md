@@ -16,7 +16,7 @@ export AWS_BACKEND_REGION="$AWS_BACKEND_REGION"
 
 cd terraform/
 
-# run vet and compile on application code, also it prepares the executables
+# run vet and compile on application code, it also prepares the executables for deployment
 make compile
 
 # creates the backend bucket on S3 (if doesn't exist, this could take a few seconds), initializes the terraform, create the workspaces, validate and do the plan

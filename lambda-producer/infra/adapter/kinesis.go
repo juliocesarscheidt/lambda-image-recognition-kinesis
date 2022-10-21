@@ -3,13 +3,19 @@ package adapter
 import (
 	"context"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kinesis"
 	"log"
 	"os"
 )
 
-func GetKinesisClient() (*kinesis.Kinesis, error) {
+// client adapter
+type KinesisClientAdapter struct {
+	PutRecordsWithContext func(ctx aws.Context, input *kinesis.PutRecordsInput, opts ...request.Option) (*kinesis.PutRecordsOutput, error)
+}
+
+func GetKinesisClient() (*KinesisClientAdapter, error) {
 	region := os.Getenv("AWS_DEFAULT_REGION")
 	if region == "" {
 		region = "us-east-1"
@@ -21,10 +27,14 @@ func GetKinesisClient() (*kinesis.Kinesis, error) {
 		log.Fatal(err)
 		return nil, err
 	}
-	return kinesis.New(sess), nil
+	client := kinesis.New(sess)
+	kinesisClientAdapter := &KinesisClientAdapter{
+		PutRecordsWithContext: client.PutRecordsWithContext,
+	}
+	return kinesisClientAdapter, nil
 }
 
-func PublishToDataStream(ctx context.Context, kinesisClient *kinesis.Kinesis,
+func PublishToDataStream(ctx context.Context, kinesisClient *KinesisClientAdapter,
 	messageEncoded []byte, streamName string, partitionKey string) (int64, error) {
 	result, err := kinesisClient.PutRecordsWithContext(ctx, &kinesis.PutRecordsInput{
 		Records: []*kinesis.PutRecordsRequestEntry{

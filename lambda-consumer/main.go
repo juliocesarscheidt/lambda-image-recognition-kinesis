@@ -56,20 +56,20 @@ func main() {
 // func main() {
 // 	ctx := context.Background()
 
-// 	messageTexts := []dto.MessageTexts{
+// 	messageTexts := []dto.MessageTextsDto{
 // 		{
-// 			TextType: "LINE",
-// 			Confidence: 95.0,
+// 			TextType:     "LINE",
+// 			Confidence:   95.0,
 // 			DetectedText: "Blackdevs",
 // 		},
 // 		{
-// 			TextType: "LINE",
-// 			Confidence: 95.0,
+// 			TextType:     "LINE",
+// 			Confidence:   95.0,
 // 			DetectedText: "Software",
 // 		},
 // 	}
 // 	message := &dto.MessageDto{
-// 		Path: "image.jpg",
+// 		Path:         "test001.png",
 // 		MessageTexts: messageTexts,
 // 	}
 
@@ -83,15 +83,15 @@ func main() {
 // 		Records: []events.KinesisEventRecord{
 // 			{
 // 				Kinesis: events.KinesisRecord{
-// 					PartitionKey: "image.jpg",
+// 					PartitionKey:   "test001.png",
 // 					SequenceNumber: "49545115243490985018280067714973144582180062593244200961",
-// 					Data: []byte(messageEncoded),
+// 					Data:           []byte(messageEncoded),
 // 				},
-// 				EventSource: "aws:kinesis",
+// 				EventSource:  "aws:kinesis",
 // 				EventVersion: "1.0",
-// 				EventID: "shardId-000000000000:49545115243490985018280067714973144582180062593244200961",
-// 				EventName: "aws:kinesis:record",
-// 				AwsRegion: "us-east-1",
+// 				EventID:      "shardId-000000000000:49545115243490985018280067714973144582180062593244200961",
+// 				EventName:    "aws:kinesis:record",
+// 				AwsRegion:    "us-east-1",
 // 			},
 // 		},
 // 	}
