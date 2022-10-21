@@ -8,8 +8,7 @@ resource "aws_s3_bucket" "bucket" {
   lifecycle_rule {
     id      = "old-files"
     enabled = true
-    # prefix  = ""
-    # move to one zone infrequent access
+    # move every old file to one zone infrequent access
     transition {
       days          = 30
       storage_class = "ONEZONE_IA"
@@ -51,40 +50,40 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   ]
 }
 
-# resource "aws_s3_bucket_policy" "bucket_policy" {
-#   bucket = aws_s3_bucket.bucket.id
-#   policy = <<EOF
-# {
-#   "Version": "2012-10-17",
-#   "Statement": [
-#         {
-#             "Sid": "DenyIncorrectEncryptionHeader",
-#             "Effect": "Deny",
-#             "Principal": "*",
-#             "Action": "s3:PutObject",
-#             "Resource": "arn:aws:s3:::${var.bucket_name}-${var.env}/*",
-#             "Condition": {
-#                 "StringNotEquals": {
-#                     "s3:x-amz-server-side-encryption": "AES256"
-#                 }
-#             }
-#         },
-#         {
-#             "Sid": "DenyUnencryptedObjectUploads",
-#             "Effect": "Deny",
-#             "Principal": "*",
-#             "Action": "s3:PutObject",
-#             "Resource": "arn:aws:s3:::${var.bucket_name}-${var.env}/*",
-#             "Condition": {
-#                 "Null": {
-#                     "s3:x-amz-server-side-encryption": "true"
-#                 }
-#             }
-#         }
-#     ]
-# }
-# EOF
-#   depends_on = [
-#     aws_s3_bucket.bucket,
-#   ]
-# }
+resource "aws_s3_bucket_policy" "bucket_policy" {
+  bucket = aws_s3_bucket.bucket.id
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyIncorrectEncryptionHeader",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::${var.bucket_name}-${var.env}/*",
+      "Condition": {
+        "StringNotEquals": {
+          "s3:x-amz-server-side-encryption": "AES256"
+        }
+      }
+    },
+    {
+      "Sid": "DenyUnencryptedObjectUploads",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::${var.bucket_name}-${var.env}/*",
+      "Condition": {
+        "Null": {
+          "s3:x-amz-server-side-encryption": "true"
+        }
+      }
+    }
+  ]
+}
+EOF
+  depends_on = [
+    aws_s3_bucket.bucket,
+  ]
+}

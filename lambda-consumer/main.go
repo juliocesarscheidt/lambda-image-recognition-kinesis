@@ -13,12 +13,12 @@ import (
 	"time"
 )
 
-// define the clients before the handler function
+// define the clients outside the handler function
 var dynamoDbClient, _ = adapter.GetDynamoDbClient()
 
 func HandleRequest(ctx context.Context, kinesisEvent events.KinesisEvent) (string, error) {
 	// ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
 	// get table name from env
@@ -91,7 +91,6 @@ func main() {
 // 				EventVersion: "1.0",
 // 				EventID: "shardId-000000000000:49545115243490985018280067714973144582180062593244200961",
 // 				EventName: "aws:kinesis:record",
-// 				InvokeIdentityArn: "arn:aws:iam::EXAMPLE",
 // 				AwsRegion: "us-east-1",
 // 			},
 // 		},

@@ -1,7 +1,18 @@
-# Event Driven applications with Kinesis and Golang
+# Event Driven application for text recognition on images, using AWS Rekognition, AWS Kinesis and Golang
 
-## Architecture
+In this project, we will be using Lambda Functions to produce and consume from Kinesis Data Stream, amd these functions are written in Golang.
 
+## Description
+
+The input of the system will be a S3 bucket, and when it receives an uploaded file it will trigger the producer Lambda Function.
+
+This producer Lambda Function will use the image from S3 event as input to AWS Rekognition to detect texts on the image, and with the response from Rekognition the function will send these records to Kinesis Data Stream.
+
+The Kinesis Data Stream when it will receive records from producer, it will trigger the consumer Lambda Function, which in turn it will get these records and persist them into DynamoDB.
+
+All the infrastructure could be deployed as code (IaC) through Terraform.
+
+## Cloud architecture
 ![Architecture](./architecture/kinesis-lambda.drawio.png)
 
-Each shard can support writes up to 1,000 records per second, up to a maximum data write total of 1 MB per second. Each PutRecords request can support up to 500 records. Each record in the request can be as large as 1 MB, up to a limit of 5 MB for the entire request, including partition keys.
+Instructions for deploy here: [Instructions](./infrastructure/README.md)

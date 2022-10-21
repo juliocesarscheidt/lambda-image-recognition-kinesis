@@ -11,13 +11,13 @@ import (
 	"time"
 )
 
-// define the clients before the handler function
+// define the clients outside the handler function
 var rekognitionClient, _ = adapter.GetRekognitionClient()
 var kinesisClient, _ = adapter.GetKinesisClient()
 
 func HandleRequest(ctx context.Context, s3Event events.S3Event) (string, error) {
 	// ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
 	// get stream name from env

@@ -1,10 +1,10 @@
 .terraform
 *.tfstate*
-output.json
 development.tfvars
 staging.tfvars
 production.tfvars
 tfplan
 .terraform*
-id_rsa*
 *.zip
+producer
+consumer

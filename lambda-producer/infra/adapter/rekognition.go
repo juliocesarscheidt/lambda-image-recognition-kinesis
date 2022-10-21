@@ -34,11 +34,8 @@ func GetImageTexts(ctx context.Context, rekognitionClient *rekognition.Rekogniti
 		Path:         imagePath,
 		MessageTexts: []dto.MessageTexts{},
 	}
-
-	// (*DetectTextOutput, error)
 	detectTextOutput, err := rekognitionClient.DetectTextWithContext(ctx, &rekognition.DetectTextInput{
 		Image: &rekognition.Image{
-			// Bytes []byte `min:"1" type:"blob"`,
 			S3Object: &rekognition.S3Object{
 				Bucket: aws.String(bucketName),
 				Name:   aws.String(imagePath),
@@ -70,7 +67,6 @@ func GetImageTexts(ctx context.Context, rekognitionClient *rekognition.Rekogniti
 			Confidence:   confidence,
 			DetectedText: *textDetection.DetectedText,
 		}
-
 		messageDto.MessageTexts = append(messageDto.MessageTexts, messageText)
 	}
 
@@ -82,7 +78,7 @@ func GetImageTexts(ctx context.Context, rekognitionClient *rekognition.Rekogniti
 	fmt.Println(string(messageEncoded))
 
 	messageSizeInBytes := binary.Size(messageEncoded)
-	fmt.Println(fmt.Sprintf("Message size in KB: %.2f", float64(messageSizeInBytes)/1024))
+	fmt.Println(fmt.Sprintf("Message size in KBs: %.2f", float64(messageSizeInBytes)/1024))
 
 	return messageEncoded, nil
 }

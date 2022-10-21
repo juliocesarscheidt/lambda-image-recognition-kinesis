@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "env" {
   type        = string
   description = "Environment"
-  default     = "dev"
+  default     = "development"
 }
 
 variable "kinesis_stream_name" {
@@ -25,7 +25,7 @@ variable "kinesis_shard_count" {
 variable "bucket_name" {
   type        = string
   description = "Bucket name"
-  default     = "rekognition-bucket-j65hdfa4"
+  default     = "rekognition-bucket"
 }
 
 variable "dynamodb_table_name" {
@@ -34,16 +34,28 @@ variable "dynamodb_table_name" {
   default     = "rekognition"
 }
 
+variable "dynamodb_rcu" {
+  type        = number
+  description = "Dynamodb RCU"
+  default     = 1
+}
+
+variable "dynamodb_wcu" {
+  type        = number
+  description = "Dynamodb WCU"
+  default     = 1
+}
+
 variable "lambda_producer_name" {
   type        = string
   description = "Lambda producer name"
   default     = "rekognition-lambda-producer"
 }
 
-variable "lambda_producer_file_path" {
+variable "lambda_producer_file_name" {
   type        = string
   description = "Lambda producer file name"
-  default     = "../../lambda-producer/main"
+  default     = "producer"
 }
 
 variable "lambda_consumer_name" {
@@ -52,8 +64,8 @@ variable "lambda_consumer_name" {
   default     = "rekognition-lambda-consumer"
 }
 
-variable "lambda_consumer_file_path" {
+variable "lambda_consumer_file_name" {
   type        = string
   description = "Lambda consumer file name"
-  default     = "../../lambda-consumer/main"
+  default     = "consumer"
 }
