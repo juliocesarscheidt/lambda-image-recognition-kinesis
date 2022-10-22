@@ -1,8 +1,8 @@
-package usecase
+package service
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/kinesis"
 	"github.com/juliocesarscheidt/lambda-producer/infra/adapter"
@@ -20,7 +20,7 @@ func PublishToDataStream(ctx context.Context, kinesisClient *adapter.KinesisClie
 		StreamName: aws.String(streamName),
 	})
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(fmt.Sprintf("Error: %s", err))
 		return 0, err
 	}
 	return *result.FailedRecordCount, nil

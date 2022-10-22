@@ -1,4 +1,4 @@
-package usecase
+package service
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/rekognition"
-	"github.com/juliocesarscheidt/lambda-producer/application/usecase"
+	"github.com/juliocesarscheidt/lambda-producer/application/service"
 	"github.com/juliocesarscheidt/lambda-producer/infra/adapter"
 	"testing"
 )
@@ -33,7 +33,7 @@ func TestBuildMessagesFromTextsOnlyAboveThreshold(t *testing.T) {
 	}
 
 	imagePath := "test001.png"
-	messageDto := usecase.BuildMessagesFromTexts(textDetectionsMock, imagePath)
+	messageDto := service.BuildMessagesFromTexts(textDetectionsMock, imagePath)
 
 	// check if the detected texts returned will be only the ones with confidence above or equal threshold
 	if len(messageDto.MessageTexts) != 2 {
@@ -56,7 +56,7 @@ func TestBuildMessagesFromTextsOnlyLineType(t *testing.T) {
 	}
 
 	imagePath := "test001.png"
-	messageDto := usecase.BuildMessagesFromTexts(textDetectionsMock, imagePath)
+	messageDto := service.BuildMessagesFromTexts(textDetectionsMock, imagePath)
 
 	// check if the detected texts returned will be only the ones with confidence above the threshold
 	if len(messageDto.MessageTexts) != 0 {
@@ -82,7 +82,7 @@ func TestDetectTextsFromImage(t *testing.T) {
 			},
 		},
 	}
-	messageDtoMock := usecase.BuildMessagesFromTexts(rekognitionMock.TextDetections, imagePath)
+	messageDtoMock := service.BuildMessagesFromTexts(rekognitionMock.TextDetections, imagePath)
 	messageEncodedMock, err := json.Marshal(&messageDtoMock)
 	if err != nil {
 		t.Errorf("Error: %s", err)
@@ -95,7 +95,7 @@ func TestDetectTextsFromImage(t *testing.T) {
 		},
 	}
 
-	messagesEncoded, err := usecase.DetectTextsFromImage(ctx, rekognitionClientMock, bucketName, imagePath)
+	messagesEncoded, err := service.DetectTextsFromImage(ctx, rekognitionClientMock, bucketName, imagePath)
 	if err != nil {
 		t.Errorf("Error: %s", err)
 	}

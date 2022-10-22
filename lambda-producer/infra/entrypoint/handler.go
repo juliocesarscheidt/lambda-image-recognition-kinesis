@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/juliocesarscheidt/lambda-producer/application/usecase"
+	"github.com/juliocesarscheidt/lambda-producer/application/service"
 	"github.com/juliocesarscheidt/lambda-producer/infra/adapter"
 	"log"
 	"os"
@@ -30,15 +30,15 @@ func HandleRequest(ctx context.Context, s3Event events.S3Event) (string, error) 
 		fmt.Printf("[%s - %s] Bucket = %s, Key = %s \n", record.EventSource, record.EventTime, bucketName, imagePath)
 
 		// retrieve the texts from the image
-		messagesEncoded, err := usecase.DetectTextsFromImage(ctx, rekognitionClient, bucketName, imagePath)
+		messagesEncoded, err := service.DetectTextsFromImage(ctx, rekognitionClient, bucketName, imagePath)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(fmt.Sprintf("Error: %s", err))
 			return "", err
 		}
 		// publish to kinesis stream
-		failedMessages, err := usecase.PublishToDataStream(ctx, kinesisClient, messagesEncoded, streamName, imagePath)
+		failedMessages, err := service.PublishToDataStream(ctx, kinesisClient, messagesEncoded, streamName, imagePath)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(fmt.Sprintf("Error: %s", err))
 			return "", err
 		}
 

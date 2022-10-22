@@ -23,7 +23,7 @@ func GetKinesisClient() (*KinesisClientAdapter, error) {
 		Region: aws.String(region)},
 	)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(fmt.Sprintf("Error: %s", err))
 		return nil, err
 	}
 	client := kinesis.New(sess)

@@ -1,4 +1,4 @@
-package usecase
+package service
 
 import (
 	"context"
@@ -59,7 +59,7 @@ func DetectTextsFromImage(ctx context.Context, rekognitionClient *adapter.Rekogn
 	}
 	detectTextOutput, err := rekognitionClient.DetectTextWithContext(ctx, detectTextInput)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(fmt.Sprintf("Error: %s", err))
 		return nil, err
 	}
 	textDetections := detectTextOutput.TextDetections
@@ -67,7 +67,8 @@ func DetectTextsFromImage(ctx context.Context, rekognitionClient *adapter.Rekogn
 	messageDto := BuildMessagesFromTexts(textDetections, imagePath)
 	messageEncoded, err := json.Marshal(&messageDto)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(fmt.Sprintf("Error: %s", err))
+		return nil, err
 	}
 	// messageEncoded is a array of bytes []byte{}
 	fmt.Println(string(messageEncoded))
