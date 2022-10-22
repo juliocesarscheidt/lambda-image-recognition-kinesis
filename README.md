@@ -15,6 +15,6 @@ Both the Kinesis Data Stream and the S3 Bucket are going to use encryption using
 All the infrastructure could be deployed as code (IaC) through Terraform.
 
 ## Cloud architecture
-![Architecture](./architecture/kinesis-lambda.drawio.png)
+![Architecture](./architecture/kinesis-lambda.drawio.svg)
 
 Instructions for deploy here: [Instructions](./infrastructure/README.md)
