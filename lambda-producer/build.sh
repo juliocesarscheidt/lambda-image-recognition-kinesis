@@ -8,7 +8,7 @@ docker container run -v $PWD:/go/src/app -w /go/src/app -e GOOS=linux -e GOARCH=
 # go vet
 # go fmt
 
-# go test tests/**/*_test.go
+# go test tests/**/*_test.go -v
 # go test -cover -coverpkg=github.com/juliocesarscheidt/lambda-producer/application/service -coverprofile cover.out tests/**/*_test.go
 # go tool cover -html=cover.out -o cover.html
 

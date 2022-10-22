@@ -6,7 +6,6 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/juliocesarscheidt/lambda-producer/application/service"
 	"github.com/juliocesarscheidt/lambda-producer/infra/adapter"
-	"log"
 	"os"
 	"time"
 )

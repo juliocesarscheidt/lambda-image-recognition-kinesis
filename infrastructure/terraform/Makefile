@@ -16,14 +16,22 @@ AWS_BACKEND_REGION?=sa-east-1
 GOLANG_VERSION?=1.18-alpine
 
 go-vet:
-	docker container run -v $$(pwd)/../../lambda-producer:/go/src/app -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go vet .
-	docker container run -v $$(pwd)/../../lambda-consumer:/go/src/app -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go vet .
+	docker container run --rm -v $$(pwd)/../../lambda-producer:/go/src/app -v producer-cache:/go/pkg/mod -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go vet .
+	docker container run --rm -v $$(pwd)/../../lambda-consumer:/go/src/app -v consumer-cache:/go/pkg/mod -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go vet .
 
-compile: go-vet
-	docker container run -v $$(pwd)/../../lambda-producer:/go/src/app -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go build -ldflags="-s -w" -o producer
+go-test:
+	docker container run --rm -v $$(pwd)/../../lambda-producer:/go/src/app -v producer-cache:/go/pkg/mod -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) sh -c "go test tests/**/*_test.go -v"
+	docker container run --rm -v $$(pwd)/../../lambda-consumer:/go/src/app -v consumer-cache:/go/pkg/mod -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) sh -c "go test tests/**/*_test.go -v"
+
+compile: go-vet go-test
+	docker container run --rm -v $$(pwd)/../../lambda-producer:/go/src/app -v producer-cache:/go/pkg/mod -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go build -ldflags="-s -w" -o producer
 	mv ../../lambda-producer/producer producer
-	docker container run -v $$(pwd)/../../lambda-consumer:/go/src/app -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go build -ldflags="-s -w" -o consumer
+	docker container run --rm -v $$(pwd)/../../lambda-consumer:/go/src/app -v consumer-cache:/go/pkg/mod -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go build -ldflags="-s -w" -o consumer
 	mv ../../lambda-consumer/consumer consumer
+
+clean:
+	docker volume rm -f producer-cache
+	docker volume rm -f consumer-cache
 
 create-backend-bucket:
 	aws s3 ls s3://$(AWS_BACKEND_BUCKET) --region $(AWS_BACKEND_REGION) || \
@@ -83,3 +91,4 @@ destroy:
 	terraform destroy \
 		-var-file=$(ENV).tfvars \
 		-auto-approve
+	rm -rf tfplan consumer consumer.zip producer producer.zip .terraform .terraform.lock.hcl

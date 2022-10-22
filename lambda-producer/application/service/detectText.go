@@ -9,7 +9,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/rekognition"
 	"github.com/juliocesarscheidt/lambda-producer/application/dto"
 	"github.com/juliocesarscheidt/lambda-producer/infra/adapter"
-	"log"
 )
 
 const confidenceThreshold = 90
