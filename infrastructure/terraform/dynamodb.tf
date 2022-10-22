@@ -1,5 +1,5 @@
 resource "aws_dynamodb_table" "dynamodb_table" {
-  name           = "${var.dynamodb_table_name}_${var.env}"
+  name           = "${var.dynamodb_table_name}-${var.env}"
   hash_key       = "path"
   stream_enabled = false
   billing_mode   = "PROVISIONED"
@@ -10,7 +10,7 @@ resource "aws_dynamodb_table" "dynamodb_table" {
     type = "S"
   }
   tags = {
-    Name        = "${var.dynamodb_table_name}_${var.env}"
+    Name        = "${var.dynamodb_table_name}-${var.env}"
     Environment = var.env
   }
 }

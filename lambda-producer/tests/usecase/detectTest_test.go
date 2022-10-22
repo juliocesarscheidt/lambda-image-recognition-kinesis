@@ -1,10 +1,12 @@
-package adapter
+package usecase
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/rekognition"
+	"github.com/juliocesarscheidt/lambda-producer/application/usecase"
 	"github.com/juliocesarscheidt/lambda-producer/infra/adapter"
 	"testing"
 )
@@ -31,7 +33,7 @@ func TestBuildMessagesFromTextsOnlyAboveThreshold(t *testing.T) {
 	}
 
 	imagePath := "test001.png"
-	messageDto := adapter.BuildMessagesFromTexts(textDetectionsMock, imagePath)
+	messageDto := usecase.BuildMessagesFromTexts(textDetectionsMock, imagePath)
 
 	// check if the detected texts returned will be only the ones with confidence above or equal threshold
 	if len(messageDto.MessageTexts) != 2 {
@@ -54,7 +56,7 @@ func TestBuildMessagesFromTextsOnlyLineType(t *testing.T) {
 	}
 
 	imagePath := "test001.png"
-	messageDto := adapter.BuildMessagesFromTexts(textDetectionsMock, imagePath)
+	messageDto := usecase.BuildMessagesFromTexts(textDetectionsMock, imagePath)
 
 	// check if the detected texts returned will be only the ones with confidence above the threshold
 	if len(messageDto.MessageTexts) != 0 {
@@ -62,7 +64,7 @@ func TestBuildMessagesFromTextsOnlyLineType(t *testing.T) {
 	}
 }
 
-func TestDetectTexts(t *testing.T) {
+func TestDetectTextsFromImage(t *testing.T) {
 	bucketName := "rekognition-bucket"
 	imagePath := "test001.png"
 
@@ -80,31 +82,25 @@ func TestDetectTexts(t *testing.T) {
 			},
 		},
 	}
+	messageDtoMock := usecase.BuildMessagesFromTexts(rekognitionMock.TextDetections, imagePath)
+	messageEncodedMock, err := json.Marshal(&messageDtoMock)
+	if err != nil {
+		t.Errorf("Error: %s", err)
+	}
 
 	ctx := context.Background()
-
 	rekognitionClientMock := &adapter.RekognitionClientAdapter{
 		DetectTextWithContext: func(ctx context.Context, input *rekognition.DetectTextInput, opts ...request.Option) (*rekognition.DetectTextOutput, error) {
 			return rekognitionMock, nil
 		},
 	}
 
-	detectTextInput := &rekognition.DetectTextInput{
-		Image: &rekognition.Image{
-			S3Object: &rekognition.S3Object{
-				Bucket: aws.String(bucketName),
-				Name:   aws.String(imagePath),
-			},
-		},
-	}
-	textDetections, err := adapter.DetectTexts(ctx, rekognitionClientMock, detectTextInput)
+	messagesEncoded, err := usecase.DetectTextsFromImage(ctx, rekognitionClientMock, bucketName, imagePath)
 	if err != nil {
 		t.Errorf("Error: %s", err)
 	}
 
-	rekognitionMockTextDetections := rekognitionMock.TextDetections
-
-	if len(rekognitionMockTextDetections) != len(textDetections) {
-		t.Errorf("Expected %v, got %v", rekognitionMock.TextDetections, textDetections)
+	if len(messagesEncoded) != len(messageEncodedMock) {
+		t.Errorf("Expected %v, got %v", messagesEncoded, messageEncodedMock)
 	}
 }

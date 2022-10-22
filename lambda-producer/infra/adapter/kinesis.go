@@ -1,7 +1,6 @@
 package adapter
 
 import (
-	"context"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -32,22 +31,4 @@ func GetKinesisClient() (*KinesisClientAdapter, error) {
 		PutRecordsWithContext: client.PutRecordsWithContext,
 	}
 	return kinesisClientAdapter, nil
-}
-
-func PublishToDataStream(ctx context.Context, kinesisClient *KinesisClientAdapter,
-	messageEncoded []byte, streamName string, partitionKey string) (int64, error) {
-	result, err := kinesisClient.PutRecordsWithContext(ctx, &kinesis.PutRecordsInput{
-		Records: []*kinesis.PutRecordsRequestEntry{
-			{
-				Data:         messageEncoded,
-				PartitionKey: aws.String(partitionKey),
-			},
-		},
-		StreamName: aws.String(streamName),
-	})
-	if err != nil {
-		log.Fatal(err)
-		return 0, err
-	}
-	return *result.FailedRecordCount, nil
 }

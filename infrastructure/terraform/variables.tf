@@ -31,7 +31,7 @@ variable "bucket_name" {
 variable "dynamodb_table_name" {
   type        = string
   description = "Dynamodb table name"
-  default     = "rekognition"
+  default     = "rekognition-table"
 }
 
 variable "dynamodb_rcu" {

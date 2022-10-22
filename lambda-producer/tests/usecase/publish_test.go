@@ -1,4 +1,4 @@
-package adapter
+package usecase
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/kinesis"
 	"github.com/juliocesarscheidt/lambda-producer/infra/adapter"
+	"github.com/juliocesarscheidt/lambda-producer/application/usecase"
 	"testing"
 )
 
@@ -24,7 +25,7 @@ func TestPublishToDataStream(t *testing.T) {
 	streamName := "rekognition-stream"
 	imagePath := "test001.png"
 
-	failedMessages, err := adapter.PublishToDataStream(ctx, kinesisClientMock, messagesEncoded, streamName, imagePath)
+	failedMessages, err := usecase.PublishToDataStream(ctx, kinesisClientMock, messagesEncoded, streamName, imagePath)
 	if err != nil {
 		t.Errorf("Error: %s", err)
 	}

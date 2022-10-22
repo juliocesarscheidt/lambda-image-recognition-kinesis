@@ -15,7 +15,7 @@ resource "aws_lambda_function" "lambda_consumer" {
   timeout          = 30
   environment {
     variables = {
-      TABLE_NAME = "${var.dynamodb_table_name}_${var.env}"
+      TABLE_NAME = "${var.dynamodb_table_name}-${var.env}"
     }
   }
   depends_on = [
