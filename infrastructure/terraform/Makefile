@@ -73,7 +73,7 @@ tf-lint:
 		ghcr.io/terraform-linters/tflint
 
 refresh:
-	terraform refresh	-var-file=$(ENV).tfvars
+	terraform refresh -var-file=$(ENV).tfvars
 
 output:
 	terraform output
