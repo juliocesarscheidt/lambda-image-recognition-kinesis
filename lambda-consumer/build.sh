@@ -9,7 +9,7 @@ docker container run -v $PWD:/go/src/app -w /go/src/app -e GOOS=linux -e GOARCH=
 # go fmt
 
 # go test tests/**/*_test.go -v
-# go test -cover -coverpkg=github.com/juliocesarscheidt/lambda-consumer/application/service -coverprofile cover.out tests/**/*_test.go
+# go test -cover -coverpkg=github.com/juliocesarscheidt/lambda-consumer/application/usecase -coverprofile cover.out tests/**/*_test.go
 # go tool cover -html=cover.out -o cover.html
 
 # go mod download

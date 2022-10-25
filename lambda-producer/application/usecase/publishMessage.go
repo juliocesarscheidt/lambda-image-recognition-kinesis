@@ -1,14 +1,14 @@
-package service
+package usecase
 
 import (
 	"context"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/kinesis"
-	"github.com/juliocesarscheidt/lambda-producer/infra/adapter"
+	"github.com/juliocesarscheidt/lambda-producer/application/adapter"
 )
 
-func PublishToDataStream(ctx context.Context, kinesisClient *adapter.KinesisClientAdapter,
+func PublishMessage(ctx context.Context, kinesisClient *adapter.KinesisClientAdapter,
 	messageEncoded []byte, streamName string, partitionKey string) (int64, error) {
 	result, err := kinesisClient.PutRecordsWithContext(ctx, &kinesis.PutRecordsInput{
 		Records: []*kinesis.PutRecordsRequestEntry{

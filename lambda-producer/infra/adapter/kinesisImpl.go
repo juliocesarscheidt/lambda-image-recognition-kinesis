@@ -3,18 +3,13 @@ package adapter
 import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kinesis"
+	"github.com/juliocesarscheidt/lambda-producer/application/adapter"
 	"os"
 )
 
-// client adapter
-type KinesisClientAdapter struct {
-	PutRecordsWithContext func(ctx aws.Context, input *kinesis.PutRecordsInput, opts ...request.Option) (*kinesis.PutRecordsOutput, error)
-}
-
-func GetKinesisClient() (*KinesisClientAdapter, error) {
+func GetKinesisClient() (*adapter.KinesisClientAdapter, error) {
 	region := os.Getenv("AWS_DEFAULT_REGION")
 	if region == "" {
 		region = "us-east-1"
@@ -27,7 +22,7 @@ func GetKinesisClient() (*KinesisClientAdapter, error) {
 		return nil, err
 	}
 	client := kinesis.New(sess)
-	kinesisClientAdapter := &KinesisClientAdapter{
+	kinesisClientAdapter := &adapter.KinesisClientAdapter{
 		PutRecordsWithContext: client.PutRecordsWithContext,
 	}
 	return kinesisClientAdapter, nil

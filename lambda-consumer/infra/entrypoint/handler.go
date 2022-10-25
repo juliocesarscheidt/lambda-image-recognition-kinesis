@@ -3,11 +3,9 @@ package entrypoint
 import (
 	"context"
 	"fmt"
-	"encoding/json"
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/juliocesarscheidt/lambda-consumer/application/usecase"
 	"github.com/juliocesarscheidt/lambda-consumer/infra/adapter"
-	"github.com/juliocesarscheidt/lambda-consumer/application/dto"
-	"github.com/juliocesarscheidt/lambda-consumer/application/service"
 	"os"
 	"time"
 )
@@ -26,19 +24,12 @@ func HandleRequest(ctx context.Context, kinesisEvent events.KinesisEvent) (strin
 	// get information from the events
 	for _, record := range kinesisEvent.Records {
 		kinesis := record.Kinesis
-
 		fmt.Println(fmt.Sprintf("Partition Key: %s", kinesis.PartitionKey))
 		fmt.Println(fmt.Sprintf("Sequence Number: %s", kinesis.SequenceNumber))
+		data := kinesis.Data
+		fmt.Println(fmt.Sprintf("Data: %s", string(data)))
 
-		fmt.Println(string(kinesis.Data))
-
-		var messageDto dto.MessageDto
-		if err := json.Unmarshal(kinesis.Data, &messageDto); err != nil {
-			fmt.Println(fmt.Sprintf("Error: %s", err))
-			return "", err
-		}
-
-		err := service.PersistItem(ctx, dynamoDbClient, tableName, messageDto)
+		err := usecase.PersistMessage(ctx, dynamoDbClient, tableName, data)
 		if err != nil {
 			fmt.Println(fmt.Sprintf("Error: %s", err))
 			return "", err

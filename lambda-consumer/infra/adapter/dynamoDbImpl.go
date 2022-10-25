@@ -1,20 +1,15 @@
 package adapter
 
 import (
+	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/aws/aws-sdk-go/aws/request"
-	"fmt"
+	"github.com/juliocesarscheidt/lambda-consumer/application/adapter"
 	"os"
 )
 
-// client adapter
-type DynamoDbClientAdapter struct {
-	PutItemWithContext func(ctx aws.Context, input *dynamodb.PutItemInput, opts ...request.Option) (*dynamodb.PutItemOutput, error)
-}
-
-func GetDynamoDbClient() (*DynamoDbClientAdapter, error) {
+func GetDynamoDbClient() (*adapter.DynamoDbClientAdapter, error) {
 	region := os.Getenv("AWS_DEFAULT_REGION")
 	if region == "" {
 		region = "us-east-1"
@@ -27,7 +22,7 @@ func GetDynamoDbClient() (*DynamoDbClientAdapter, error) {
 		return nil, err
 	}
 	client := dynamodb.New(sess)
-	dynamoDbClientAdapter := &DynamoDbClientAdapter{
+	dynamoDbClientAdapter := &adapter.DynamoDbClientAdapter{
 		PutItemWithContext: client.PutItemWithContext,
 	}
 	return dynamoDbClientAdapter, nil

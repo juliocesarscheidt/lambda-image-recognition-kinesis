@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"context"
@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/rekognition"
+	"github.com/juliocesarscheidt/lambda-producer/application/adapter"
 	"github.com/juliocesarscheidt/lambda-producer/application/dto"
-	"github.com/juliocesarscheidt/lambda-producer/infra/adapter"
 )
 
 const confidenceThreshold = 90

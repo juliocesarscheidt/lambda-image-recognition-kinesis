@@ -1,17 +1,17 @@
-package service
+package usecase
 
 import (
 	"context"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/kinesis"
-	"github.com/juliocesarscheidt/lambda-producer/infra/adapter"
-	"github.com/juliocesarscheidt/lambda-producer/application/service"
+	"github.com/juliocesarscheidt/lambda-producer/application/adapter"
+	"github.com/juliocesarscheidt/lambda-producer/application/usecase"
 	"testing"
 	"errors"
 )
 
-func TestPublishToDataStream(t *testing.T) {
+func TestPublishMessage(t *testing.T) {
 	ctx := context.Background()
 
 	kinesisClientMock := &adapter.KinesisClientAdapter{
@@ -26,7 +26,7 @@ func TestPublishToDataStream(t *testing.T) {
 	streamName := "rekognition-stream"
 	imagePath := "test001.png"
 
-	failedMessages, err := service.PublishToDataStream(ctx, kinesisClientMock, messagesEncoded, streamName, imagePath)
+	failedMessages, err := usecase.PublishMessage(ctx, kinesisClientMock, messagesEncoded, streamName, imagePath)
 	if err != nil {
 		t.Errorf("Error: %s", err)
 	}
@@ -36,7 +36,7 @@ func TestPublishToDataStream(t *testing.T) {
 	}
 }
 
-func TestPublishToDataStreamFailed(t *testing.T) {
+func TestPublishMessageFailed(t *testing.T) {
 	ctx := context.Background()
 
 	expectedErr := errors.New("Error while publishing to data stream")
@@ -51,7 +51,7 @@ func TestPublishToDataStreamFailed(t *testing.T) {
 	streamName := "rekognition-stream"
 	imagePath := "test001.png"
 
-	_, err := service.PublishToDataStream(ctx, kinesisClientMock, messagesEncoded, streamName, imagePath)
+	_, err := usecase.PublishMessage(ctx, kinesisClientMock, messagesEncoded, streamName, imagePath)
 	if err != expectedErr {
 		t.Errorf("Expected error: %s, got %s", expectedErr, err)
 	}

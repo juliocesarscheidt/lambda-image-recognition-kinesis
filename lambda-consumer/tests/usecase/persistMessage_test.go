@@ -2,17 +2,18 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/juliocesarscheidt/lambda-consumer/infra/adapter"
+	"github.com/juliocesarscheidt/lambda-consumer/application/adapter"
 	"github.com/juliocesarscheidt/lambda-consumer/application/dto"
-	"github.com/juliocesarscheidt/lambda-consumer/application/service"
+	"github.com/juliocesarscheidt/lambda-consumer/application/usecase"
 	"testing"
 	"errors"
 )
 
-func TestPersistItem(t *testing.T) {
+func TestPersistMessage(t *testing.T) {
 	ctx := context.Background()
 
 	dynamoDbClient := &adapter.DynamoDbClientAdapter{
@@ -27,13 +28,15 @@ func TestPersistItem(t *testing.T) {
 	}
 	tableName := "rekognition-table"
 
-	err := service.PersistItem(ctx, dynamoDbClient, tableName, messageDtoMock)
+	messageEncodedMock, _ := json.Marshal(&messageDtoMock)
+
+	err := usecase.PersistMessage(ctx, dynamoDbClient, tableName, messageEncodedMock)
 	if err != nil {
 		t.Errorf("Expected err to be nil, got %v", err)
 	}
 }
 
-func TestPersistItemFailed(t *testing.T) {
+func TestPersistMessageFailed(t *testing.T) {
 	ctx := context.Background()
 
 	expectedErr := errors.New("Error while persisting data")
@@ -50,7 +53,9 @@ func TestPersistItemFailed(t *testing.T) {
 	}
 	tableName := "rekognition-table"
 
-	err := service.PersistItem(ctx, dynamoDbClient, tableName, messageDtoMock)
+	messageEncodedMock, _ := json.Marshal(&messageDtoMock)
+
+	err := usecase.PersistMessage(ctx, dynamoDbClient, tableName, messageEncodedMock)
 	if err != expectedErr {
 		t.Errorf("Expected err to be %v, got %v", expectedErr, err)
 	}

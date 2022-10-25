@@ -1,19 +1,15 @@
 package adapter
 
 import (
+	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/rekognition"
+	"github.com/juliocesarscheidt/lambda-producer/application/adapter"
 	"os"
 )
 
-// client adapter
-type RekognitionClientAdapter struct {
-	DetectTextWithContext func(ctx aws.Context, input *rekognition.DetectTextInput, opts ...request.Option) (*rekognition.DetectTextOutput, error)
-}
-
-func GetRekognitionClient() (*RekognitionClientAdapter, error) {
+func GetRekognitionClient() (*adapter.RekognitionClientAdapter, error) {
 	region := os.Getenv("AWS_DEFAULT_REGION")
 	if region == "" {
 		region = "us-east-1"
@@ -22,10 +18,11 @@ func GetRekognitionClient() (*RekognitionClientAdapter, error) {
 		Region: aws.String(region)},
 	)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: %s", err))
 		return nil, err
 	}
 	client := rekognition.New(sess)
-	rekognitionClientAdapter := &RekognitionClientAdapter{
+	rekognitionClientAdapter := &adapter.RekognitionClientAdapter{
 		DetectTextWithContext: client.DetectTextWithContext,
 	}
 	return rekognitionClientAdapter, nil
