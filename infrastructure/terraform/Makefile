@@ -88,6 +88,7 @@ apply:
 	terraform apply $(PLAN_FILE)
 
 destroy:
+	aws s3 rm --recursive s3://$$(terraform output bucket_name) --region $(AWS_BACKEND_REGION)
 	terraform destroy \
 		-var-file=$(ENV).tfvars \
 		-auto-approve
