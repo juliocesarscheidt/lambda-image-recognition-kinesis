@@ -25,4 +25,4 @@ It was used Sonarqube locally to gather the coverage for unit tests
 
 ![Quality Gate](./quality-gate/sonarqube.png)
 
-[] TODO: Increase coverage
+- [ ] TODO: Increase coverage
