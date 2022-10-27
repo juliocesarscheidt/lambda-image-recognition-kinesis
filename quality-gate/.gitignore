@@ -1,0 +1,4 @@
+.sonarqube_token
+.sonarqube_password
+lambda-consumer
+lambda-producer

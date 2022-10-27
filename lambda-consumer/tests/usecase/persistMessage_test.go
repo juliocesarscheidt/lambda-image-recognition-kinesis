@@ -36,7 +36,7 @@ func TestPersistMessage(t *testing.T) {
 	}
 }
 
-func TestPersistMessageFailed(t *testing.T) {
+func TestPersistMessageFailedWhenPersisting(t *testing.T) {
 	ctx := context.Background()
 
 	expectedErr := errors.New("Error while persisting data")
@@ -52,11 +52,26 @@ func TestPersistMessageFailed(t *testing.T) {
 		MessageTexts: []dto.MessageTextsDto{},
 	}
 	tableName := "rekognition-table"
-
 	messageEncodedMock, _ := json.Marshal(&messageDtoMock)
 
 	err := usecase.PersistMessage(ctx, dynamoDbClient, tableName, messageEncodedMock)
-	if err != expectedErr {
+	if err.Error() != expectedErr.Error() {
+		t.Errorf("Expected err to be %v, got %v", expectedErr, err)
+	}
+}
+
+func TestPersistMessageFailedWhenUnmarshaling(t *testing.T) {
+	ctx := context.Background()
+
+	expectedErr := errors.New("unexpected end of JSON input")
+
+	dynamoDbClient := &adapter.DynamoDbClientAdapter{}
+
+	tableName := "rekognition-table"
+	messageEncodedMock := []byte{}
+
+	err := usecase.PersistMessage(ctx, dynamoDbClient, tableName, messageEncodedMock)
+	if err.Error() != expectedErr.Error() {
 		t.Errorf("Expected err to be %v, got %v", expectedErr, err)
 	}
 }

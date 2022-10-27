@@ -21,8 +21,6 @@ Instructions for deploy here: [Instructions](./infrastructure/README.md)
 
 ## Code coverage
 
-It was used Sonarqube locally to gather the coverage for unit tests
+It was used Sonarqube to gather the coverage for unit tests.
 
 ![Quality Gate](./quality-gate/sonarqube.png)
-
-- [ ] TODO: Increase coverage

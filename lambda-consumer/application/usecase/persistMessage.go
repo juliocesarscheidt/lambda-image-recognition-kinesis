@@ -11,15 +11,19 @@ import (
 	"github.com/juliocesarscheidt/lambda-consumer/application/dto"
 )
 
+func fmtError(err error) {
+	fmt.Println(fmt.Sprintf("Error: %s", err))
+}
+
 func PersistMessage(ctx context.Context, dynamoDbClient *adapter.DynamoDbClientAdapter, tableName string, itemData []byte) error {
 	var messageDto dto.MessageDto
 	if err := json.Unmarshal(itemData, &messageDto); err != nil {
-		fmt.Println(fmt.Sprintf("Error: %s", err))
+		fmtError(err)
 		return err
 	}
 	dynamoDbItem, err := dynamodbattribute.MarshalMap(messageDto)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("Error: %s", err))
+		fmtError(err)
 		return err
 	}
 	inputPutItem := &dynamodb.PutItemInput{
@@ -28,7 +32,7 @@ func PersistMessage(ctx context.Context, dynamoDbClient *adapter.DynamoDbClientA
 	}
 	_, err = dynamoDbClient.PutItemWithContext(ctx, inputPutItem)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("Error: %s", err))
+		fmtError(err)
 		return err
 	}
 	return nil
