@@ -46,34 +46,25 @@ else
   echo "${TOKEN}" > ".sonarqube_token"
 fi
 
+########################### scan ###########################
+function scan_project() {
+  local PROJECT_KEY="$1"
+  cd "${SRC_PATH}/${PROJECT_KEY}"
+  go test -cover -coverpkg="github.com/juliocesarscheidt/${PROJECT_KEY}/application/usecase" -coverprofile cover.out tests/**/*_test.go
+  docker container run --rm \
+    --name sonarscanner \
+    --network host \
+    -e SONAR_HOST_URL="http://${SONARQUBE_URL}" \
+    -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=${PROJECT_KEY}" \
+    -e SONAR_LOGIN="${TOKEN}" \
+    -v "${PWD}:/usr/src" \
+    -v sonar-cache:/opt/sonar-scanner/.sonar/cache \
+    -w /usr/src \
+    sonarsource/sonar-scanner-cli:4
+}
+
 ########################### consumer ###########################
-export PROJECT_KEY='lambda-consumer'
-cd "${SRC_PATH}/${PROJECT_KEY}"
-go test -cover -coverpkg="github.com/juliocesarscheidt/${PROJECT_KEY}/application/usecase" -coverprofile cover.out tests/**/*_test.go
-
-docker container run --rm \
-  --name sonarscanner \
-  --network host \
-  -e SONAR_HOST_URL="http://${SONARQUBE_URL}" \
-  -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=${PROJECT_KEY}" \
-  -e SONAR_LOGIN="${TOKEN}" \
-  -v "${PWD}:/usr/src" \
-  -v sonar-cache:/opt/sonar-scanner/.sonar/cache \
-  -w /usr/src \
-  sonarsource/sonar-scanner-cli:4
+scan_project 'lambda-consumer'
 
 ########################### consumer ###########################
-export PROJECT_KEY='lambda-producer'
-cd "${SRC_PATH}/${PROJECT_KEY}"
-go test -cover -coverpkg="github.com/juliocesarscheidt/${PROJECT_KEY}/application/usecase" -coverprofile cover.out tests/**/*_test.go
-
-docker container run --rm \
-  --network host \
-  --name sonarscanner \
-  -e SONAR_HOST_URL="http://${SONARQUBE_URL}" \
-  -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=${PROJECT_KEY}" \
-  -e SONAR_LOGIN="${TOKEN}" \
-  -v "${PWD}:/usr/src" \
-  -v sonar-cache:/opt/sonar-scanner/.sonar/cache \
-  -w /usr/src \
-  sonarsource/sonar-scanner-cli:4
+scan_project 'lambda-producer'

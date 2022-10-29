@@ -16,17 +16,43 @@ AWS_BACKEND_REGION?=sa-east-1
 GOLANG_VERSION?=1.18-alpine
 
 go-vet:
-	docker container run --rm -v $$(pwd)/../../lambda-producer:/go/src/app -v producer-cache:/go/pkg/mod -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go vet .
-	docker container run --rm -v $$(pwd)/../../lambda-consumer:/go/src/app -v consumer-cache:/go/pkg/mod -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go vet .
+	docker container run --rm \
+		-v $$(pwd)/../../lambda-producer:/go/src/app \
+		-v producer-cache:/go/pkg/mod -w /go/src/app \
+		-e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on \
+		-e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go vet .
+	docker container run --rm \
+		-v $$(pwd)/../../lambda-consumer:/go/src/app \
+		-v consumer-cache:/go/pkg/mod -w /go/src/app \
+		-e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on \
+		-e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go vet .
 
 go-test:
-	docker container run --rm -v $$(pwd)/../../lambda-producer:/go/src/app -v producer-cache:/go/pkg/mod -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) sh -c "go test tests/**/*_test.go -v"
-	docker container run --rm -v $$(pwd)/../../lambda-consumer:/go/src/app -v consumer-cache:/go/pkg/mod -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) sh -c "go test tests/**/*_test.go -v"
+	docker container run --rm \
+		-v $$(pwd)/../../lambda-producer:/go/src/app \
+		-v producer-cache:/go/pkg/mod -w /go/src/app \
+		-e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on \
+		-e CGO_ENABLED=0 golang:$(GOLANG_VERSION) \
+		sh -c "go test tests/**/*_test.go -v"
+	docker container run --rm \
+		-v $$(pwd)/../../lambda-consumer:/go/src/app \
+		-v consumer-cache:/go/pkg/mod -w /go/src/app \
+		-e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on \
+		-e CGO_ENABLED=0 golang:$(GOLANG_VERSION) \
+		sh -c "go test tests/**/*_test.go -v"
 
 compile: go-vet go-test
-	docker container run --rm -v $$(pwd)/../../lambda-producer:/go/src/app -v producer-cache:/go/pkg/mod -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go build -ldflags="-s -w" -o producer
+	docker container run --rm \
+		-v $$(pwd)/../../lambda-producer:/go/src/app \
+		-v producer-cache:/go/pkg/mod -w /go/src/app \
+		-e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on \
+		-e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go build -ldflags="-s -w" -o producer
 	mv ../../lambda-producer/producer producer
-	docker container run --rm -v $$(pwd)/../../lambda-consumer:/go/src/app -v consumer-cache:/go/pkg/mod -w /go/src/app -e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on -e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go build -ldflags="-s -w" -o consumer
+	docker container run --rm \
+		-v $$(pwd)/../../lambda-consumer:/go/src/app \
+		-v consumer-cache:/go/pkg/mod -w /go/src/app \
+		-e GOOS=linux -e GOARCH=amd64 -e GO111MODULE=on \
+		-e CGO_ENABLED=0 golang:$(GOLANG_VERSION) go build -ldflags="-s -w" -o consumer
 	mv ../../lambda-consumer/consumer consumer
 
 clean:
@@ -35,7 +61,8 @@ clean:
 
 create-backend-bucket:
 	aws s3 ls s3://$(AWS_BACKEND_BUCKET) --region $(AWS_BACKEND_REGION) || \
-		aws s3api create-bucket --bucket $(AWS_BACKEND_BUCKET) --region $(AWS_BACKEND_REGION) --acl private
+		aws s3api create-bucket --bucket $(AWS_BACKEND_BUCKET) \
+		--region $(AWS_BACKEND_REGION) --acl private
 
 delete-backend-bucket:
 	aws s3 rm --recursive s3://$(AWS_BACKEND_BUCKET) --region $(AWS_BACKEND_REGION)
